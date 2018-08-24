@@ -19,7 +19,11 @@ def normalizeChars(line):
     return line
 
 def removeStopWords(line):
-    stopwords = ['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas', 'por', 'que', 'es']
+    stopwords = ['el', 'la', 'los', 'las', 'le',
+                 'un', 'una', 'unos', 'unas',
+                 'por', 'que', 'con', 'de', 'del', 'para', 'a',
+                 'si',
+                 'es']
     querywords = line.split()
     resultwords = [word for word in querywords if word.lower() not in stopwords]
     return ' '.join(resultwords)
