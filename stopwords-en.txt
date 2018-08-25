@@ -8,7 +8,10 @@ from
 to
 by
 if
+he
+she
 is
+you
 are
 do
 and
@@ -22,3 +25,4 @@ in
 or
 it
 have
+how

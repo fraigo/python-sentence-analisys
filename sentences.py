@@ -48,13 +48,18 @@ def sortByValue(items, reverse):
 def appendStats(stats, detail, words, line, count):
     sortedPhrases = list(sortedChunks(words, count))
     phrases = list(chunks(words, count))
+    key=0
     for phrase in sortedPhrases:
         if phrase in stats:
             stats[phrase] += 1
-            detail[phrase].append(line)
+            detail[phrase]['questions'].append(line)
+            detail[phrase]['words'].append(phrases[key])
         else:
             stats[phrase] = 1
-            detail[phrase] = []
+            detail[phrase] = {}
+            detail[phrase]['questions'] = [line]
+            detail[phrase]['words'] = [phrases[key]]
+        key+=1
 
     return stats
 
@@ -86,8 +91,9 @@ sortedPhrases = sortByValue(phrases, reverse=True)
 #pprint.pprint(sortedPhrases)
 
 for key, value in sortedPhrases:
-    print("\n[" + key + "] " + str(value) + " ocurrences:" )
-    for line in details[key]:
+    words = details[key]['words'][0]
+    print("\n[" + words + "] " + str(value) + " ocurrences:" )
+    for line in details[key]['questions']:
         print(line)
 
 
