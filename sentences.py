@@ -1,7 +1,6 @@
 import unidecode
-import pprint
-
-import nltk
+#import pprint
+#import nltk
 #from nltk.corpus import cess_esp as cess
 
 #nltk.download('punkt')
@@ -9,42 +8,46 @@ import nltk
 #nltk.download('maxent_ne_chunker')
 #nltk.download('words')
 
-
+# to remove any non-alphanumeric character, punctuation, marks.
 def removeNonWords(line):
     line = ''.join(e for e in line if e.isalnum() or e.isspace())
     return line
 
+# to normalize special unicode characters to a common unicode character (á , â => a)
 def normalizeChars(line):
     line = unidecode.unidecode(line)
     line = line.lower()
     return line
 
+# to remove non-relevant words to analyze
 def removeStopWords(stopWords, line):
     querywords = line.split()
     resultwords = [word for word in querywords if word.lower() not in stopWords]
     return ' '.join(resultwords)
 
-def sortedChunks(list, n):
-    for i in range(0, len(list) - n, 1):
-        yield ' '.join(sorted(list[i:i + n]))
-
+# to make groups of n words to create arbitrary sentences
 def chunks(list, n):
     for i in range(0, len(list) - n, 1):
         yield ' '.join(list[i:i + n])
 
-def sortingCount(value):
-    return value
+# to make groups of n words to create arbitrary sentences, sorting words alphabetically to normalize the pattern
+def sortedChunks(list, n):
+    for i in range(0, len(list) - n, 1):
+        yield ' '.join(sorted(list[i:i + n]))
 
-def dropValues(items, max):
+# to delete all dictionary ocurrences with a value less or equal to maxValue
+def dropValues(items, maxValue):
     result = dict(items)
     for key, value in items.items():
-        if value <= max:
+        if value <= maxValue:
             del result[key]
     return result
 
+# to sort a dictionary for value (number of ocurrences)
 def sortByValue(items, reverse):
     return sorted(items.items(), key=lambda x: x[1], reverse=reverse)
 
+# append info to global statistics: repeated phrases and details
 def appendStats(stats, detail, words, line, count):
     sortedPhrases = list(sortedChunks(words, count))
     phrases = list(chunks(words, count))
@@ -60,15 +63,24 @@ def appendStats(stats, detail, words, line, count):
             detail[phrase]['questions'] = [line]
             detail[phrase]['words'] = [phrases[key]]
         key+=1
-
     return stats
 
+def removeDuplicates(items):
+    return list(set(items))
+
+
+# ======================
+# Main program execution
+# ======================
+
+# select folder to read configuration and data
 lang = "en"
 
 # open file and read lines
 file = open(lang + "/sentences.txt")
 # lines = file.readlines()
 lines = file.read().splitlines()
+lines = removeDuplicates(lines)
 
 file = open(lang + "/stopwords.txt")
 stopWords = file.read().splitlines()
@@ -83,18 +95,20 @@ for line in lines:
     tmp = normalizeChars(tmp)
     tmp = removeStopWords(stopWords,tmp)
     words = tmp.split()
-    phrases = appendStats(phrases, details, words, line,  3)
+    phrases = appendStats(phrases, details, words, line, 2)
+    phrases = appendStats(phrases, details, words, line, 3)
     phrases = appendStats(phrases, details, words, line, 4)
 
 phrases = dropValues(phrases, 2)
 
 sortedPhrases = sortByValue(phrases, reverse=True)
 
-#pprint.pprint(sortedPhrases)
+print ( "Total lines " + str(len(lines)))
 
 for key, value in sortedPhrases:
     words = details[key]['words'][0]
-    print("\n[" + words + "] " + str(value) + " ocurrences:" )
+    perc = value * 100 / len(lines)
+    print("\n[" + words + "] " + str(value) + " ocurrences (" + ("%.2f" % perc) + "%) :" )
     for line in details[key]['questions']:
         print(line)
 
