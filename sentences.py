@@ -63,12 +63,14 @@ def appendStats(stats, detail, words, line, count):
 
     return stats
 
+lang = "en"
+
 # open file and read lines
-file = open("sentences.txt")
+file = open(lang + "/sentences.txt")
 # lines = file.readlines()
 lines = file.read().splitlines()
 
-file = open("stopwords-en.txt")
+file = open(lang + "/stopwords.txt")
 stopWords = file.read().splitlines()
 
 phrases = {}
